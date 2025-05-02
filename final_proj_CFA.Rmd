@@ -1,0 +1,201 @@
+---
+title: "HW6_LuChang"
+author: "Chang Lu"
+date: "2025-04-29"
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+```{r}
+library(dplyr)
+```
+
+
+data preparation - self-reported bfi
+```{r}
+df_self <- read.csv("~/Desktop/conversation/SCFIS-Zoom_Initial_W1_SharedReality 1.csv")
+
+bfi_self <- df_self %>%
+  select(I_bfi10_findsfault, I_bfi11_thorough, I_bfi12_depressed, I_bfi13_original, I_bfi21_reserved, 
+         I_bfi14_unselfish, I_bfi15_careless, I_bfi16_relaxed, I_bfi1_energy, I_bfi18_quarrels, 
+         I_bfi19_reliable, I_bfi20_tense, I_bfi22_deepthinker, I_bfi3_enthusiasm, I_bfi23_forgiving, 
+         I_bfi5_quiet, I_bfi7_assertive, I_bfi8_shy, I_bfi4_calm, I_bfi9_outgoing, I_bfi6_makesplans
+  ) %>%
+  rename(
+    bfi_2 = I_bfi10_findsfault,
+    bfi_3 = I_bfi11_thorough,
+    bfi_4 = I_bfi12_depressed,
+    bfi_5 = I_bfi13_original,
+    bfi_6 = I_bfi21_reserved,
+    bfi_7 = I_bfi14_unselfish,
+    bfi_8 = I_bfi15_careless,
+    bfi_9 = I_bfi16_relaxed,
+    bfi_11 = I_bfi1_energy,
+    bfi_12 = I_bfi18_quarrels,
+    bfi_13 = I_bfi19_reliable,
+    bfi_14 = I_bfi20_tense,
+    bfi_15 = I_bfi22_deepthinker,
+    bfi_16 = I_bfi3_enthusiasm,
+    bfi_17 = I_bfi23_forgiving,
+    bfi_21 = I_bfi5_quiet,
+    bfi_26 = I_bfi7_assertive,
+    bfi_31 = I_bfi8_shy,
+    bfi_34 = I_bfi4_calm,
+    bfi_36 = I_bfi9_outgoing,
+    bfi_38 = I_bfi6_makesplans
+  )
+
+#reverse-coded items
+bfi_self$bfi_2R <- 6 - bfi_df$bfi_2
+bfi_self$bfi_6R <- 6 - bfi_df$bfi_6
+bfi_self$bfi_8R <- 6 - bfi_df$bfi_8
+bfi_self$bfi_9R <- 6 - bfi_df$bfi_9
+bfi_self$bfi_12R <- 6 - bfi_df$bfi_12
+bfi_self$bfi_21R <- 6 - bfi_df$bfi_21
+bfi_self$bfi_31R <- 6 - bfi_df$bfi_31
+bfi_self$bfi_34R <- 6 - bfi_df$bfi_34
+
+
+bfi_df <- bfi_df %>%
+  select(-c(bfi_2, bfi_6, bfi_8, bfi_9, bfi_12, 
+            bfi_21, bfi_31, bfi_34))
+```
+
+
+```{r}
+df_other <- read.csv("~/Desktop/conversation/SCFIS-Zoom_RR_Final_W1_SharedReality.csv")
+
+bfi_other <- df_other %>%
+  select(PID, TID, Order,
+         P_bfi10_findsfault, P_bfi11_thorough, P_bfi12_depressed, P_bfi13_original, P_bfi21_reserved, 
+         P_bfi14_unselfish, P_bfi15_careless, P_bfi16_relaxed, P_bfi1_energy, P_bfi18_quarrels, 
+         P_bfi19_reliable, P_bfi20_tense, P_bfi22_deepthinker, P_bfi3_enthusiasm, P_bfi23_forgiving, 
+         P_bfi5_quiet, P_bfi7_assertive, P_bfi8_shy, P_bfi4_calm, P_bfi9_outgoing, P_bfi6_makesplans
+  ) %>%
+  rename(
+    bfi_2 = P_bfi10_findsfault,
+    bfi_3 = P_bfi11_thorough,
+    bfi_4 = P_bfi12_depressed,
+    bfi_5 = P_bfi13_original,
+    bfi_6 = P_bfi21_reserved,
+    bfi_7 = P_bfi14_unselfish,
+    bfi_8 = P_bfi15_careless,
+    bfi_9 = P_bfi16_relaxed,
+    bfi_11 = P_bfi1_energy,
+    bfi_12 = P_bfi18_quarrels,
+    bfi_13 = P_bfi19_reliable,
+    bfi_14 = P_bfi20_tense,
+    bfi_15 = P_bfi22_deepthinker,
+    bfi_16 = P_bfi3_enthusiasm,
+    bfi_17 = P_bfi23_forgiving,
+    bfi_21 = P_bfi5_quiet,
+    bfi_26 = P_bfi7_assertive,
+    bfi_31 = P_bfi8_shy,
+    bfi_34 = P_bfi4_calm,
+    bfi_36 = P_bfi9_outgoing,
+    bfi_38 = P_bfi6_makesplans
+  )
+
+#reverse-coded items
+bfi_other$bfi_2R <- 6 - bfi_other$bfi_2
+bfi_other$bfi_6R <- 6 - bfi_other$bfi_6
+bfi_other$bfi_8R <- 6 - bfi_other$bfi_8
+bfi_other$bfi_9R <- 6 - bfi_other$bfi_9
+bfi_other$bfi_12R <- 6 - bfi_other$bfi_12
+bfi_other$bfi_21R <- 6 - bfi_other$bfi_21
+bfi_other$bfi_31R <- 6 - bfi_other$bfi_31
+bfi_other$bfi_34R <- 6 - bfi_other$bfi_34
+
+
+bfi_other <- bfi_other %>%
+  select(-c(bfi_2, bfi_6, bfi_8, bfi_9, bfi_12, 
+            bfi_21, bfi_31, bfi_34))
+```
+
+
+
+get covariance matrix
+```{r}
+cov_matrix <- cov(bfi_df, use = "pairwise.complete.obs")
+```
+
+fit the 5 factor model with each item loading on one of the five factors: extraversion, neuroticism, openness, conscientiousness, agreeableness. 
+```{r}
+library(lavaan)
+cfa_mod <- "
+    # Loadings
+    Extraversion =~ bfi_1 + bfi_6R + bfi_11 + bfi_16 + bfi_21R + bfi_26 + bfi_31R + bfi_36
+    Agreeableness =~ bfi_2R + bfi_7 + bfi_12R + bfi_17 + bfi_22 + bfi_27R + bfi_32 + bfi_37R + bfi_42
+    Conscientious =~ bfi_3 + bfi_8R + bfi_13 + bfi_18R + bfi_23R + bfi_28 + bfi_33 + bfi_38 + bfi_43R
+    Neuroticism =~ bfi_4 + bfi_9R + bfi_14 + bfi_19 + bfi_24R + bfi_29 + bfi_34R + bfi_39
+    Openness =~ bfi_5 + bfi_10 + bfi_15 + bfi_20 + bfi_25 + bfi_30 + bfi_35R + bfi_40 + bfi_41R + bfi_44
+    # Factor covariances 
+    Extraversion ~~ Agreeableness + Conscientious + Neuroticism + Openness
+    Agreeableness ~~ Conscientious + Neuroticism + Openness
+    Conscientious ~~ Neuroticism + Openness
+"
+
+# Default of lavaan::cfa
+cfa_fit <- cfa(cfa_mod,
+                sample.cov = cov_matrix,
+                # number of observations
+                sample.nobs = 567,
+                # Model identified by standardizing the latent variables
+                std.lv = TRUE
+)
+```
+
+obtain model parameters
+```{r}
+summary(cfa_fit, fit.measures = TRUE)
+```
+
+residuals and modification indices
+```{r}
+resid(cfa_fit, type = "cor")
+
+modindices(cfa_fit, sort = TRUE, minimum = 10)
+```
+
+there are unmodelled correlations between multiple pairs of items, and those items are either quite similar or totally opposite in terms of wording, so I modified my model to account for the unique variances between those pairs
+```{r}
+cfa_mod_2 <- "
+    # Loadings
+    Extraversion =~ bfi_1 + bfi_6R + bfi_11 + bfi_16 + bfi_21R + bfi_26 + bfi_31R + bfi_36
+    Agreeableness =~ bfi_2R + bfi_7 + bfi_12R + bfi_17 + bfi_22 + bfi_27R + bfi_32 + bfi_37R + bfi_42
+    Conscientious =~ bfi_3 + bfi_8R + bfi_13 + bfi_18R + bfi_23R + bfi_28 + bfi_33 + bfi_38 + bfi_43R
+    Neuroticism =~ bfi_4 + bfi_9R + bfi_14 + bfi_19 + bfi_24R + bfi_29 + bfi_34R + bfi_39
+    Openness =~ bfi_5 + bfi_10 + bfi_15 + bfi_20 + bfi_25 + bfi_30 + bfi_35R + bfi_40 + bfi_41R + bfi_44
+    # Unique covariances
+    bfi_5 ~~  bfi_25
+    bfi_9R ~~ bfi_34R
+    bfi_16 ~~ bfi_11
+    bfi_30 ~~  bfi_44
+    bfi_19 ~~  bfi_39
+    bfi_4 ~~ bfi_24R
+    bfi_21R ~~ bfi_31R
+    bfi_6R ~~ bfi_21R
+    bfi_30 ~~ bfi_41R
+"
+
+cfa_fit_2 <- cfa(cfa_mod_2,
+               sample.cov = cov_matrix,
+               # number of observations
+               sample.nobs = 567,
+               # Model identified by standardizing the latent variables
+               std.lv = TRUE
+)
+```
+
+get model parameters
+```{r}
+summary(cfa_fit_2, fit.measures = TRUE)
+```
+
+Summary:
+We fit a 5-factor model with each item loading on one of the five factors: extraversion, openness, conscientiousness, neuroticism, and agreeableness. The item loading specifications are consistent with what's suggested by prior Big Five literature. We used the lavaan package (v0.6.19; Rosseel, 2012) with normal distribution-based maximum likelihood estimation. There were no missing data as all participants responded to all items. We evaluate the model using the global test, as well as goodness-of-fit indices including RMSEA (≤ .05 indicating good fit; Browne & Cudeck, 1993), CFI (≥ .95 indicating good fit; Hu & Bentler, 1999), and SRMR (≤ .08 indicating acceptable fit; Hu & Bentler, 1999). We also consider the correlation residuals and the modification indices.
+
+The test indicated that the hypothesized 5-factor model does not perfectly fit the data, 
+(N = 567, df = 892) = 3378, p < .001. The model fit is not ideal either, with RMSEA = .07, 90% CI [.068, .073], CFI = .73, and SRMR = .08. Inspection of the correlation residuals shows relatively large unmodelled correlations between multiple pairs of items, and modification indices similarly suggest adding unique covariance between those pairs of items.
+
+Given that those pairs of items have either similar wordings or totally opposite wordings, we refit the model with unique covariance between them. The model fit improves, (N = 567, df = 883) = 2696, p < .001, RMSEA = .06, 90% CI [.058, .063], CFI = .81, and SRMR = .08. Further inspection of correlation residuals and modification indices does not suggest modifications to the model that are theoretically justified.

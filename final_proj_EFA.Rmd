@@ -1,0 +1,246 @@
+---
+title: "final_proj_EFA"
+author: "Chang Lu"
+date: "2025-05-01"
+output: pdf_document
+---
+```{r}
+library(dplyr)
+```
+
+data preparation - self-reported bfi
+```{r}
+df_self <- read.csv("~/Desktop/conversation/SCFIS-Zoom_Initial_W1_SharedReality 1.csv")
+
+bfi_self <- df_self %>%
+  select(PID, I_bfi10_findsfault, I_bfi11_thorough, I_bfi12_depressed, I_bfi13_original, I_bfi21_reserved, 
+         I_bfi14_unselfish, I_bfi15_careless, I_bfi16_relaxed, I_bfi1_energy, I_bfi18_quarrels, 
+         I_bfi19_reliable, I_bfi20_tense, I_bfi22_deepthinker, I_bfi3_enthusiasm, I_bfi23_forgiving, 
+         I_bfi5_quiet, I_bfi7_assertive, I_bfi8_shy, I_bfi4_calm, I_bfi9_outgoing, I_bfi6_makesplans
+  ) %>%
+  rename(
+    bfi_2 = I_bfi10_findsfault,
+    bfi_3 = I_bfi11_thorough,
+    bfi_4 = I_bfi12_depressed,
+    bfi_5 = I_bfi13_original,
+    bfi_6 = I_bfi21_reserved,
+    bfi_7 = I_bfi14_unselfish,
+    bfi_8 = I_bfi15_careless,
+    bfi_9 = I_bfi16_relaxed,
+    bfi_11 = I_bfi1_energy,
+    bfi_12 = I_bfi18_quarrels,
+    bfi_13 = I_bfi19_reliable,
+    bfi_14 = I_bfi20_tense,
+    bfi_15 = I_bfi22_deepthinker,
+    bfi_16 = I_bfi3_enthusiasm,
+    bfi_17 = I_bfi23_forgiving,
+    bfi_21 = I_bfi5_quiet,
+    bfi_26 = I_bfi7_assertive,
+    bfi_31 = I_bfi8_shy,
+    bfi_34 = I_bfi4_calm,
+    bfi_36 = I_bfi9_outgoing,
+    bfi_38 = I_bfi6_makesplans
+  )
+
+#reverse-coded items
+bfi_self$bfi_2R <- 6 - bfi_self$bfi_2
+bfi_self$bfi_6R <- 6 - bfi_self$bfi_6
+bfi_self$bfi_8R <- 6 - bfi_self$bfi_8
+bfi_self$bfi_9R <- 6 - bfi_self$bfi_9
+bfi_self$bfi_12R <- 6 - bfi_self$bfi_12
+bfi_self$bfi_21R <- 6 - bfi_self$bfi_21
+bfi_self$bfi_31R <- 6 - bfi_self$bfi_31
+bfi_self$bfi_34R <- 6 - bfi_self$bfi_34
+
+
+bfi_self <- bfi_self %>%
+  select(-c(bfi_2, bfi_6, bfi_8, bfi_9, bfi_12, 
+            bfi_21, bfi_31, bfi_34))
+```
+
+
+```{r}
+df_other <- read.csv("~/Desktop/conversation/SCFIS-Zoom_RR_Final_W1_SharedReality.csv")
+
+bfi_other <- df_other %>%
+  select(PID, TID, Order,
+         P_bfi10_findsfault, P_bfi11_thorough, P_bfi12_depressed, P_bfi13_original, P_bfi21_reserved, 
+         P_bfi14_unselfish, P_bfi15_careless, P_bfi16_relaxed, P_bfi1_energy, P_bfi18_quarrels, 
+         P_bfi19_reliable, P_bfi20_tense, P_bfi22_deepthinker, P_bfi3_enthusiasm, P_bfi23_forgiving, 
+         P_bfi5_quiet, P_bfi7_assertive, P_bfi8_shy, P_bfi4_calm, P_bfi9_outgoing, P_bfi6_makesplans
+  ) %>%
+  rename(
+    bfi_2 = P_bfi10_findsfault,
+    bfi_3 = P_bfi11_thorough,
+    bfi_4 = P_bfi12_depressed,
+    bfi_5 = P_bfi13_original,
+    bfi_6 = P_bfi21_reserved,
+    bfi_7 = P_bfi14_unselfish,
+    bfi_8 = P_bfi15_careless,
+    bfi_9 = P_bfi16_relaxed,
+    bfi_11 = P_bfi1_energy,
+    bfi_12 = P_bfi18_quarrels,
+    bfi_13 = P_bfi19_reliable,
+    bfi_14 = P_bfi20_tense,
+    bfi_15 = P_bfi22_deepthinker,
+    bfi_16 = P_bfi3_enthusiasm,
+    bfi_17 = P_bfi23_forgiving,
+    bfi_21 = P_bfi5_quiet,
+    bfi_26 = P_bfi7_assertive,
+    bfi_31 = P_bfi8_shy,
+    bfi_34 = P_bfi4_calm,
+    bfi_36 = P_bfi9_outgoing,
+    bfi_38 = P_bfi6_makesplans
+  )
+
+#reverse-coded items
+bfi_other$bfi_2R <- 6 - bfi_other$bfi_2
+bfi_other$bfi_6R <- 6 - bfi_other$bfi_6
+bfi_other$bfi_8R <- 6 - bfi_other$bfi_8
+bfi_other$bfi_9R <- 6 - bfi_other$bfi_9
+bfi_other$bfi_12R <- 6 - bfi_other$bfi_12
+bfi_other$bfi_21R <- 6 - bfi_other$bfi_21
+bfi_other$bfi_31R <- 6 - bfi_other$bfi_31
+bfi_other$bfi_34R <- 6 - bfi_other$bfi_34
+
+
+bfi_other <- bfi_other %>%
+  select(-c(bfi_2, bfi_6, bfi_8, bfi_9, bfi_12, 
+            bfi_21, bfi_31, bfi_34))
+
+set.seed(123)
+bfi_other_subset1 <- bfi_other %>%
+  group_by(TID) %>%
+  slice_sample(n = 1) %>%
+  ungroup()
+
+set.seed(124)
+bfi_other_subset2 <- bfi_other %>%
+  group_by(TID) %>%
+  slice_sample(n = 1) %>%
+  ungroup()
+
+set.seed(548)
+bfi_other_subset3 <- bfi_other %>%
+  group_by(TID) %>%
+  slice_sample(n = 1) %>%
+  ungroup()
+
+```
+
+further data cleaning: remove IDs that don't exist in both data frames
+```{r}
+ID_to_remove <- setdiff(unique(df_self$PID), unique(df_other$TID))
+bfi_self <- subset(bfi_self, !(PID %in% ID_to_remove))
+
+ID_to_remove_2 <- setdiff(unique(df_other$TID), unique(df_self$PID))
+bfi_other_subset1 <- subset(bfi_other_subset1, !(TID %in% ID_to_remove_2))
+bfi_other_subset2 <- subset(bfi_other_subset2, !(TID %in% ID_to_remove_2))
+bfi_other_subset3 <- subset(bfi_other_subset3, !(TID %in% ID_to_remove_2))
+
+bfi_self <- select(bfi_self, -PID)
+bfi_other_subset1 <- select(bfi_other_subset1, -c(PID, TID, Order))
+bfi_other_subset2 <- select(bfi_other_subset2, -c(PID, TID, Order))
+bfi_other_subset3 <- select(bfi_other_subset3, -c(PID, TID, Order))
+```
+
+**self-reported**
+```{r}
+pcorr_self <- lavaan::lavCor(bfi_self, ordered = TRUE)
+pcorr_self
+```
+
+```{r}
+psych::fa.parallel(
+    pcorr_self,
+    n.obs = 548,
+    fm = "pa",
+    error.bars = TRUE
+)
+```
+
+```{r}
+efa_fit_self <- lavaan::efa(
+    bfi_self,
+    nfactors = 4:6,
+    ordered = TRUE,
+    rotation = "varimax"
+)
+summary(efa_fit_self)
+```
+
+**other-rated: subset 1**
+```{r}
+pcorr_other_1 <- lavaan::lavCor(bfi_other_subset1, ordered = TRUE)
+pcorr_other_1
+```
+
+```{r}
+psych::fa.parallel(
+    pcorr_other_1,
+    n.obs = 548,
+    fm = "pa",
+    error.bars = TRUE
+)
+```
+
+```{r}
+efa_fit_other_1 <- lavaan::efa(
+    bfi_other_subset1,
+    nfactors = 3:5,
+    ordered = TRUE,
+    rotation = "varimax"
+)
+summary(efa_fit_other_1)
+```
+
+**other-rated: subset 2**
+```{r}
+pcorr_other_2 <- lavaan::lavCor(bfi_other_subset2, ordered = TRUE)
+pcorr_other_2
+```
+
+```{r}
+psych::fa.parallel(
+    pcorr_other_2,
+    n.obs = 548,
+    fm = "pa",
+    error.bars = TRUE
+)
+```
+
+```{r}
+efa_fit_other_2 <- lavaan::efa(
+    bfi_other_subset2,
+    nfactors = 3:5,
+    ordered = TRUE,
+    rotation = "varimax"
+)
+summary(efa_fit_other_2)
+```
+
+**other-rated: subset 3**
+```{r}
+pcorr_other_3 <- lavaan::lavCor(bfi_other_subset3, ordered = TRUE)
+pcorr_other_3
+```
+
+```{r}
+psych::fa.parallel(
+    pcorr_other_3,
+    n.obs = 548,
+    fm = "pa",
+    error.bars = TRUE
+)
+```
+
+```{r}
+efa_fit_other_3 <- lavaan::efa(
+    bfi_other_subset3,
+    nfactors = 3:5,
+    ordered = TRUE,
+    rotation = "varimax"
+)
+summary(efa_fit_other_3)
+```
+
